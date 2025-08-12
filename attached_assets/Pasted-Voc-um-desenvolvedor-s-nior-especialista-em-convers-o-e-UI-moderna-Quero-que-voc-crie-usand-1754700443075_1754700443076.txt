@@ -1,0 +1,54 @@
+Você é um desenvolvedor sênior especialista em conversão e UI moderna.  
+Quero que você crie, usando **React + TailwindCSS**, uma **landing page responsiva** para o produto **BrokerFlow AI**, com o objetivo único de converter visitantes em usuários cadastrados no link **https://app.neurobroker-ai.cloud/**.
+
+### Estrutura que quero:
+
+1. **Header fixo**
+   - Logo do BrokerFlow AI (pode ser texto estilizado inicialmente)
+   - Menu com links: "Planos", "Como Funciona", "Login"
+   - Botão CTA "Quero Começar Agora" que leva para **https://app.neurobroker-ai.cloud/**
+
+2. **Hero Section (dobra principal)**
+   - Fundo com gradiente vibrante (laranja + roxo, estilo tech)
+   - Headline impactante: **"Conteúdo imobiliário pronto toda semana, direto na sua conta."**
+   - Subtítulo: **"Economize horas de trabalho e foque no que importa: vender. Nossa IA gera textos, posts e imagens personalizados para sua cidade e público."**
+   - Imagem ilustrativa (mockup de dashboard/app)
+   - Botão CTA grande: **"Quero Começar Agora"** → **https://app.neurobroker-ai.cloud/**
+
+3. **Seção de Benefícios**
+   - Três colunas com ícones:
+     - "Conteúdo 100% local"
+     - "Entrega automática"
+     - "Pronto para postar"
+
+4. **Seção 'Como Funciona'**
+   - Passo 1: Preencha seus dados
+   - Passo 2: IA gera conteúdo customizado
+   - Passo 3: Receba pronto toda semana
+
+5. **Tabela de Planos (4 opções)**
+   - **Plano Mensal**: R$ 49,90 – 5 créditos – R$ 9,98 por crédito
+   - **Plano Anual**: R$ 359,90 – 55 créditos – R$ 6,54 por crédito – Exibir valor mensal equivalente: R$ 29,99/mês
+   - **Avulso sem assinatura**: R$ 14,90 – 1 crédito – R$ 14,90 por crédito
+   - **Avulso com assinatura**: R$ 8,00 – 1 crédito – R$ 8,00 por crédito
+   - Cada plano com botão **"Assinar Agora"** → **https://app.neurobroker-ai.cloud/**
+
+6. **Seção de prova social**
+   - Espaço para depoimentos de corretores satisfeitos
+
+7. **Rodapé**
+   - Logo, links institucionais, termos e política de privacidade
+
+### Regras visuais:
+- Usar TailwindCSS com tipografia forte e espaçamento generoso
+- Cores principais: gradiente laranja (#ff6a00) → roxo (#8e2de2)
+- Botões grandes e chamativos
+- Layout 100% responsivo para celular
+
+### Extras:
+- Adicionar microanimações nos botões (hover e transições suaves)
+- Incluir SEO básico (title, meta description)
+- Código limpo e comentado
+- Deploy pronto para ser hospedado no Replit
+
+Crie todos os arquivos necessários (App.jsx, index.html, tailwind.config.js, etc.) para rodar imediatamente.
