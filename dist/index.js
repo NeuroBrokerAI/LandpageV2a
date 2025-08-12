@@ -73,51 +73,54 @@ function log(message, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 async function setupVite(app2, server) {
-  const { createServer: createViteServer, createLogger } = await import("vite");
-  const viteConfig = await init_vite_config().then(() => vite_config_exports);
-  const { nanoid } = await import("nanoid");
-  const viteLogger = createLogger();
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true
-  };
-  const vite = await createViteServer({
-    ...viteConfig.default,
-    configFile: false,
-    customLogger: {
-      ...viteLogger,
-      error: (msg, options) => {
-        viteLogger.error(msg, options);
-        process.exit(1);
+  if (process.env.NODE_ENV === "development") {
+    const { createServer: createViteServer, createLogger } = await import("vite");
+    const viteConfig = await init_vite_config().then(() => vite_config_exports);
+    const { nanoid } = await import("nanoid");
+    const viteLogger = createLogger();
+    const serverOptions = {
+      middlewareMode: true,
+      hmr: { server },
+      allowedHosts: true
+    };
+    const vite = await createViteServer({
+      ...viteConfig.default,
+      configFile: false,
+      customLogger: {
+        ...viteLogger,
+        error: (msg, options) => {
+          viteLogger.error(msg, options);
+          process.exit(1);
+        }
+      },
+      server: serverOptions,
+      appType: "custom"
+    });
+    app2.use(vite.middlewares);
+    app2.use("*", async (req, res, next) => {
+      const url = req.originalUrl;
+      try {
+        const clientTemplate = path2.resolve(
+          import.meta.dirname,
+          "..",
+          "client",
+          "index.html"
+        );
+        let template = await fs.promises.readFile(clientTemplate, "utf-8");
+        const { nanoid: nanoid2 } = await import("nanoid");
+        template = template.replace(
+          `src="/src/main.tsx"`,
+          `src="/src/main.tsx?v=${nanoid2()}"`
+        );
+        const page = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      } catch (e) {
+        vite.ssrFixStacktrace(e);
+        next(e);
       }
-    },
-    server: serverOptions,
-    appType: "custom"
-  });
-  app2.use(vite.middlewares);
-  app2.use("*", async (req, res, next) => {
-    const url = req.originalUrl;
-    try {
-      const clientTemplate = path2.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html"
-      );
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      const { nanoid: nanoid2 } = await import("nanoid");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid2()}"`
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e);
-      next(e);
-    }
-  });
+    });
+  }
+  return null;
 }
 function serveStatic(app2) {
   const distPath = path2.resolve(import.meta.dirname, "public");
@@ -189,11 +192,19 @@ app.use((req, res, next) => {
     throw err;
   });
   if (process.env.NODE_ENV === "development") {
-    const { setupVite: setupVite2 } = await Promise.resolve().then(() => (init_vite(), vite_exports));
-    await setupVite2(app, server);
+    try {
+      const { setupVite: setupVite2 } = await Promise.resolve().then(() => (init_vite(), vite_exports));
+      await setupVite2(app, server);
+    } catch (error) {
+      console.log("Vite setup skipped in production environment");
+    }
   } else {
-    const { serveStatic: serveStatic2 } = await Promise.resolve().then(() => (init_vite(), vite_exports));
-    serveStatic2(app);
+    try {
+      const { serveStatic: serveStatic2 } = await Promise.resolve().then(() => (init_vite(), vite_exports));
+      serveStatic2(app);
+    } catch (error) {
+      console.error("Error setting up static file serving:", error);
+    }
   }
   const port = parseInt(process.env.PORT || "5000", 10);
   server.listen({
