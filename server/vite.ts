@@ -15,10 +15,9 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
-  // Dynamic imports to avoid bundling vite in production
+  // Only setup vite in development
   if (process.env.NODE_ENV === "development") {
     const { createServer: createViteServer, createLogger } = await import("vite");
-    const viteConfig = await import("../vite.config");
     const { nanoid } = await import("nanoid");
 
     const viteLogger = createLogger();
@@ -29,8 +28,31 @@ export async function setupVite(app: Express, server: Server) {
       allowedHosts: true as const,
     };
 
+    // Inline vite config to avoid importing vite.config.ts in production bundle
+    const viteConfig = {
+      plugins: [],
+      resolve: {
+        alias: {
+          "@": path.resolve(import.meta.dirname, "..", "client", "src"),
+          "@shared": path.resolve(import.meta.dirname, "..", "shared"),
+          "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
+        },
+      },
+      root: path.resolve(import.meta.dirname, "..", "client"),
+      build: {
+        outDir: path.resolve(import.meta.dirname, "..", "dist/public"),
+        emptyOutDir: true,
+      },
+      server: {
+        fs: {
+          strict: true,
+          deny: ["**/.*"],
+        },
+      },
+    };
+
     const vite = await createViteServer({
-      ...viteConfig.default,
+      ...viteConfig,
       configFile: false,
       customLogger: {
         ...viteLogger,
